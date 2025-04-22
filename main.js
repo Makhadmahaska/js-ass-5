@@ -1,3 +1,8 @@
+const prompt = require('prompt-sync')();
+const log = console.log; 
+
+
+
 class Book {
     constructor(title, author) {
         this.title = title;
