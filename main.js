@@ -1,102 +1,107 @@
-const prompt = require('prompt-sync')();
-const log = console.log; 
 
+const library = [];
+let running = true;
 
+function addBook() {
+  const title = prompt("Enter book title:");
+  const author = prompt("Enter book author:");
+  const isReadInput = prompt("Have you read this book? (yes/no):").toLowerCase();
+  const isRead = (isReadInput === "yes");
 
-class Book {
-    constructor(title, author) {
-        this.title = title;
-        this.author = author;
-        this.isRead = false;
-    }
+  const newBook = {
+    title: title,
+    author: author,
+    isRead: isRead
+  };
+
+  library.push(newBook);
+  alert(`Book "${title}" added to the library!`);
 }
 
-class Library {
-    constructor() {
-        this.books = [];
-    }
+function listBooks() {
+  if (library.length === 0) {
+    alert("Library is empty.");
+    return;
+  }
 
-    addBook(title, author) {
-        const newBook = new Book(title, author);
-        this.books.push(newBook);
-        alert(`Lade till bok: "${title}" av ${author}`);
-    }
+  console.log("=== Book List ===");
+  library.forEach(book => {
+    console.log(`${book.title} by ${book.author} - ${book.isRead ? "Read" : "Not read"}`);
+  });
+  alert("Books have been logged to the console.");
+}
 
-    listBooks() {
-        if (this.books.length === 0) {
-            alert("Inga böcker i biblioteket.");
-            return;
-        }
-
-        let bookList = "Böcker i biblioteket:\n";
-        this.books.forEach(book => {
-            const status = book.isRead ? "✓ Lästs" : "✗ Inte lästs";
-            bookList += `- "${book.title}" av ${book.author} - ${status}\n`;
-        });
-
-        alert(bookList);
-    }
-
-    markAsRead(title) {
-        const book = this.books.find(b => b.title.toLowerCase() === title.toLowerCase());
-        if (book) {
-            book.isRead = true;
-            alert(`Markerade "${book.title}" som läst.`);
-        } else {
-            alert(`Hittade inte boken "${title}" i biblioteket.`);
-        }
-    }
-
-    isRead(title) {
-        const book = this.books.find(b => b.title.toLowerCase() === title.toLowerCase());
-        if (book) {
-            return book.isRead ? "Boken har lästs." : "Boken har inte lästs än.";
-        } else {
-            return `Hittade inte boken "${title}" i biblioteket.`;
-        }
-    }
+function markAsRead(title) {
+  const book = library.find(b => b.title === title);
+  if (book) {
+    book.isRead = true;
+    alert(`Marked "${book.title}" as read.`);
+  } else {
+    alert(`Book titled "${title}" not found.`);
+  }
 }
 
 
-const myLibrary = new Library();
-
-
-function showMenu() {
-    let choice;
-    do {
-        choice = prompt(
-            "📚 Välj ett alternativ:\n" +
-            "1. Lägg till en bok\n" +
-            "2. Lista alla böcker\n" +
-            "3. Markera bok som läst\n" +
-            "4. Kolla om bok är läst\n" +
-            "5. Avsluta"
-        );
-
-        switch (choice) {
-            case "1":
-                const title = prompt("Ange boktitel:");
-                const author = prompt("Ange författare:");
-                myLibrary.addBook(title, author);
-                break;
-            case "2":
-                myLibrary.listBooks();
-                break;
-            case "3":
-                const readTitle = prompt("Vilken bok vill du markera som läst?");
-                myLibrary.markAsRead(readTitle);
-                break;
-            case "4":
-                const checkTitle = prompt("Vilken bok vill du kolla?");
-                alert(myLibrary.isRead(checkTitle));
-                break;
-            case "5":
-                alert("Tack för att du använder biblioteket!");
-                break;
-            default:
-                alert("Ogiltigt val, försök igen.");
-        }
-    } while (choice !== "5");
+function removeBook() {
+  const title = prompt("Enter the title of the book to remove:");
+  const index = library.findIndex(b => b.title === title);
+  if (index !== -1) {
+    const removed = library.splice(index, 1);
+    alert(`Removed "${removed[0].title}" from the library.`);
+  } else {
+    alert(`Book titled "${title}" not found.`);
+  }
 }
 
-showMenu();
+
+function listUnreadBooks() {
+  const unread = library.filter(b => !b.isRead);
+  if (unread.length === 0) {
+    alert("All books have been read!");
+  } else {
+    console.log("=== Unread Books ===");
+    unread.forEach(book => {
+      console.log(`${book.title} by ${book.author}`);
+    });
+    alert("Unread books have been logged to the console.");
+  }
+}
+
+
+while (running) {
+  const choice = prompt(`
+📚 Book Tracker
+1. Add Book
+2. List Books
+3. Mark Book as Read
+4. Remove Book
+5. List Only Unread Books
+6. Exit
+
+Enter your choice:`);
+
+  switch (choice) {
+    case "1":
+      addBook();
+      break;
+    case "2":
+      listBooks();
+      break;
+    case "3":
+      const title = prompt("Enter the title of the book to mark as read:");
+      markAsRead(title);
+      break;
+    case "4":
+      removeBook();
+      break;
+    case "5":
+      listUnreadBooks();
+      break;
+    case "6":
+      running = false;
+      alert("Goodbye!");
+      break;
+    default:
+      alert("Invalid choice.");
+  }
+}
